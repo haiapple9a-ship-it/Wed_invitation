@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="km">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ផ្ទាំងគ្រប់គ្រងការចូលរួមអាពាហ៍ពិពាហ៍ | Wedding Admin Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Khmer -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Moul&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kantumruy Pro', sans-serif;
+            background: radial-gradient(circle at top, #1c1508 0%, #0c0a06 100%);
+            color: #f7fafc;
+            min-height: 100vh;
+        }
+        
+        .khmer-title {
+            font-family: 'Moul', cursive;
+        }
+        
+        .gold-border {
+            border: 1px solid rgba(212, 175, 55, 0.35);
+        }
+        
+        .gold-glow {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        }
+        
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fff2a3 0%, #d4af37 50%, #aa820a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .gold-btn {
+            background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
+            color: #000;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .gold-btn:hover {
+            background: linear-gradient(135deg, #f3db78 0%, #c49915 100%);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            transform: translateY(-1px);
+        }
+        /* Custom scrollbar */
+        
+         ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+         ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            background: #443719;
+            border-radius: 4px;
+        }
+        
+         ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8 flex flex-col items-center">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform transition-all duration-300 translate-y-[-100px] opacity-0 bg-neutral-900 border border-yellow-500/50 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i id="toast-icon" class="fas fa-check-circle text-yellow-400 text-lg"></i>
+        <span id="toast-msg" class="text-sm">ជោគជ័យ</span>
+    </div>
+
+    <!-- Login Container -->
+    <div id="login-section" class="w-full max-w-md my-auto mt-12 bg-black/60 backdrop-blur-md rounded-2xl gold-border gold-glow p-8 shadow-2xl">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full border border-yellow-500/50 flex items-center justify-center bg-yellow-500/10">
+                <i class="fas fa-shield-halved text-2xl text-yellow-400"></i>
+            </div>
+            <h1 class="khmer-title text-xl text-yellow-400 mb-2">ផ្ទាំងគ្រប់គ្រងអាពាហ៍ពិពាហ៍</h1>
+            <p class="text-xs text-yellow-100/70">Wedding RSVP & Guest Management</p>
+        </div>
+
+        <form id="login-form" class="space-y-5">
+            <div>
+                <label class="block text-xs text-yellow-200/80 mb-2">ឈ្មោះអ្នកប្រើប្រាស់ (Username)</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-yellow-500/60"><i class="fas fa-user text-sm"></i></span>
+                    <input type="text" id="login-username" required autocomplete="username" class="w-full bg-black/40 border border-yellow-500/30 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition"
+                        placeholder="admin">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs text-yellow-200/80 mb-2">ពាក្យសម្ងាត់ (Password)</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-yellow-500/60"><i class="fas fa-lock text-sm"></i></span>
+                    <input type="password" id="login-password" required autocomplete="current-password" class="w-full bg-black/40 border border-yellow-500/30 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition"
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <div id="login-error" class="hidden text-xs text-red-400 bg-red-950/50 border border-red-800 rounded-lg p-3 text-center"></div>
+
+            <button type="submit" id="login-btn" class="w-full gold-btn py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer">
+                <span>ចូលទៅផ្ទាំងគ្រប់គ្រង</span>
+                <i class="fas fa-arrow-right text-xs"></i>
+            </button>
+        </form>
+
+        <div class="mt-6 pt-4 border-t border-yellow-500/20 text-center">
+            <a href="/" class="text-xs text-yellow-400/80 hover:text-yellow-300 transition flex items-center justify-center gap-2">
+                <i class="fas fa-arrow-left"></i>
+                <span>ត្រឡប់ទៅកាន់ទំព័រមង្គលការ (Back to Invite)</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div id="dashboard-section" class="w-full max-w-6xl hidden space-y-6">
+
+        <!-- Top Navbar -->
+        <header class="bg-black/60 backdrop-blur-md rounded-2xl gold-border p-5 flex flex-wrap items-center justify-between gap-4 gold-glow">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full border border-yellow-500/60 flex items-center justify-center bg-yellow-500/10">
+                    <i class="fas fa-ring text-yellow-400 text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="khmer-title text-base md:text-lg text-yellow-400 leading-snug">ការគ្រប់គ្រងភ្ញៀវមង្គលការ</h2>
+                    <p class="text-xs text-yellow-100/70">កម្រងបញ្ជីឈ្មោះភ្ញៀវ និងពាក្យជូនពរ</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <a href="/" target="_blank" class="px-3.5 py-2 text-xs rounded-xl border border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/10 transition flex items-center gap-1.5">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span class="hidden sm:inline">មើលទំព័រការ</span>
+                </a>
+                <button onclick="openChangePasswordModal()" class="px-3.5 py-2 text-xs rounded-xl border border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/10 transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-key"></i>
+                    <span class="hidden sm:inline">ប្តូរពាក្យសម្ងាត់</span>
+                </button>
+                <button onclick="handleLogout()" class="px-3.5 py-2 text-xs rounded-xl bg-red-900/60 border border-red-700/60 text-red-200 hover:bg-red-800 transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>ចាកចេញ</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Total RSVPs -->
+            <div class="bg-black/50 backdrop-blur-md rounded-2xl gold-border p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400 text-xl">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-yellow-100/70">ចំនួនឆ្លើយតបសរុប</p>
+                    <h3 id="stat-total" class="text-2xl font-bold text-yellow-400">0</h3>
+                </div>
+            </div>
+
+            <!-- Attending -->
+            <div class="bg-black/50 backdrop-blur-md rounded-2xl gold-border p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-emerald-200/70">អញ្ជើញចូលរួម</p>
+                    <h3 id="stat-attending" class="text-2xl font-bold text-emerald-400">0</h3>
+                </div>
+            </div>
+
+            <!-- Declined -->
+            <div class="bg-black/50 backdrop-blur-md rounded-2xl gold-border p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl">
+                    <i class="fas fa-circle-xmark"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-amber-200/70">អភ័យទោសខកខាន</p>
+                    <h3 id="stat-declined" class="text-2xl font-bold text-amber-400">0</h3>
+                </div>
+            </div>
+
+            <!-- Wishes -->
+            <div class="bg-black/50 backdrop-blur-md rounded-2xl gold-border p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-purple-200/70">ពាក្យជូនពរទទួលបាន</p>
+                    <h3 id="stat-wishes" class="text-2xl font-bold text-purple-400">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter, Search & Export Bar -->
+        <div class="bg-black/50 backdrop-blur-md rounded-2xl gold-border p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- Search -->
+            <div class="relative w-full md:w-80">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-yellow-500/60"><i class="fas fa-search text-xs"></i></span>
+                <input type="text" id="search-input" placeholder="ស្វែងរកតាមឈ្មោះ ឬសារជូនពរ..." class="w-full bg-black/40 border border-yellow-500/30 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-yellow-400">
+            </div>
+
+            <!-- Filter tabs -->
+            <div class="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                <button onclick="setFilter('')" id="filter-all" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-medium gold-btn cursor-pointer">
+                    ទាំងអស់ (<span id="count-all">0</span>)
+                </button>
+                <button onclick="setFilter('អញ្ជើញចូលរួម')" id="filter-attending" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-medium border border-yellow-500/30 text-yellow-200/80 hover:bg-yellow-500/10 cursor-pointer">
+                    ចូលរួម (<span id="count-attending">0</span>)
+                </button>
+                <button onclick="setFilter('អភ័យទោសខកខាន')" id="filter-declined" class="filter-tab px-3 py-1.5 rounded-lg text-xs font-medium border border-yellow-500/30 text-yellow-200/80 hover:bg-yellow-500/10 cursor-pointer">
+                    ខកខាន (<span id="count-declined">0</span>)
+                </button>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                <button onclick="loadDashboardData()" title="ទាញទិន្នន័យឡើងវិញ" class="p-2 px-3 text-xs rounded-xl border border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/10 transition cursor-pointer">
+                    <i class="fas fa-rotate"></i>
+                </button>
+                <button onclick="exportToCSV()" class="gold-btn px-4 py-2 rounded-xl text-xs flex items-center gap-2 cursor-pointer">
+                    <i class="fas fa-file-excel"></i>
+                    <span>ទាញយក Excel / CSV</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- RSVP Data Table -->
+        <div class="bg-black/50 backdrop-blur-md rounded-2xl gold-border overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-yellow-950/40 border-b border-yellow-500/20 text-yellow-300">
+                        <tr>
+                            <th class="py-3.5 px-4 w-12 text-center">#</th>
+                            <th class="py-3.5 px-4 font-semibold">ឈ្មោះភ្ញៀវកិត្តិយស</th>
+                            <th class="py-3.5 px-4 font-semibold">ស្ថានភាពចូលរួម</th>
+                            <th class="py-3.5 px-4 font-semibold">ពាក្យជូនពរ</th>
+                            <th class="py-3.5 px-4 font-semibold">កាលបរិច្ឆេទ</th>
+                            <th class="py-3.5 px-4 text-center w-16">សកម្មភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rsvp-table-body" class="divide-y divide-yellow-500/10 text-neutral-200">
+                        <!-- Loaded dynamically -->
+                        <tr>
+                            <td colspan="6" class="py-8 text-center text-yellow-200/50">
+                                <i class="fas fa-spinner fa-spin mr-2"></i> កំពុងផ្ទុកទិន្នន័យ...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer / Pagination -->
+            <div class="p-4 bg-yellow-950/20 border-t border-yellow-500/10 flex flex-wrap items-center justify-between gap-3 text-xs text-yellow-100/70">
+                <div>
+                    បង្ហាញ <span id="page-showing" class="font-bold text-yellow-400">0</span> នៃ <span id="page-total" class="font-bold text-yellow-400">0</span> នាក់
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-prev-page" onclick="changePage(-1)" class="px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-yellow-500/10 transition cursor-pointer">
+                        <i class="fas fa-chevron-left mr-1"></i> ថយក្រោយ
+                    </button>
+                    <span id="page-indicator" class="px-2 font-semibold text-yellow-400">1</span>
+                    <button id="btn-next-page" onclick="changePage(1)" class="px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-yellow-500/10 transition cursor-pointer">
+                        បន្ទាប់ <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="password-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-neutral-950 border border-yellow-500/50 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <button onclick="closeChangePasswordModal()" class="absolute top-4 right-4 text-neutral-400 hover:text-white">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <h3 class="khmer-title text-base text-yellow-400 mb-4 flex items-center gap-2">
+                <i class="fas fa-key text-yellow-500"></i>
+                <span>ផ្លាស់ប្តូរពាក្យសម្ងាត់គ្រប់គ្រង</span>
+            </h3>
+
+            <form id="password-form" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-yellow-100/80 mb-1">ពាក្យសម្ងាត់បច្ចុប្បន្ន (Current Password)</label>
+                    <input type="password" id="pwd-current" required class="w-full bg-black/60 border border-yellow-500/30 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-400">
+                </div>
+                <div>
+                    <label class="block text-yellow-100/80 mb-1">ពាក្យសម្ងាត់ថ្មី (New Password, min 8 chars)</label>
+                    <input type="password" id="pwd-new" required minlength="8" class="w-full bg-black/60 border border-yellow-500/30 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-400">
+                </div>
+                <div>
+                    <label class="block text-yellow-100/80 mb-1">បញ្ជាក់ពាក្យសម្ងាត់ថ្មី (Confirm New Password)</label>
+                    <input type="password" id="pwd-confirm" required minlength="8" class="w-full bg-black/60 border border-yellow-500/30 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-yellow-400">
+                </div>
+                <div id="pwd-error" class="hidden text-red-400 bg-red-950/40 p-2 rounded-lg border border-red-800 text-center"></div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 rounded-xl border border-yellow-500/30 text-yellow-200 hover:bg-yellow-500/10">បោះបង់</button>
+                    <button type="submit" class="gold-btn px-4 py-2 rounded-xl">រក្សាទុកការផ្លាស់ប្តូរ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Frontend Script -->
+    <script>
+        let currentFilter = '';
+        let currentSearch = '';
+        let currentPage = 1;
+        const pageSize = 50;
+        let totalCount = 0;
+
+        function showToast(msg, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = msg;
+            toastIcon.className = isSuccess ? 'fas fa-check-circle text-green-400 text-lg' : 'fas fa-exclamation-triangle text-red-400 text-lg';
+
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-100px]', 'opacity-0');
+            }, 3000);
+        }
+
+        // Safe API Base URL detection (handles file://, live server on port 5500, or port 3000)
+        const API_BASE = (window.location.protocol === 'file:' || (window.location.port !== '3000' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))) ?
+            'http://localhost:3000' :
+            '';
+
+        // Safe JSON parser to prevent "Unexpected end of JSON input" errors
+        async function safeParseJson(res) {
+            try {
+                const text = await res.text();
+                if (!text || !text.trim()) return {};
+                return JSON.parse(text);
+            } catch (e) {
+                return {};
+            }
+        }
+
+        // Check Auth Status on Load
+        async function checkAuth() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/me', {
+                    credentials: 'include'
+                });
+                if (res.ok) {
+                    showDashboard();
+                } else {
+                    showLogin();
+                }
+            } catch (err) {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('login-section').classList.remove('hidden');
+            document.getElementById('dashboard-section').classList.add('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            loadDashboardData();
+        }
+
+        // Login Handler
+        document.getElementById('login-form').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+
+            errorDiv.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>កំពុងផ្ទៀងផ្ទាត់...</span>';
+
+            try {
+                const res = await fetch(API_BASE + '/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        username,
+                        password
+                    })
+                });
+
+                const data = await safeParseJson(res);
+                if (!res.ok) {
+                    throw new Error(data.error || 'ការចូលប្រើប្រាស់មិនជោគជ័យ');
+                }
+
+                showToast('ចូលប្រើប្រាស់បានជោគជ័យ!');
+                showDashboard();
+            } catch (err) {
+                let msg = err.message;
+                if (err.name === 'TypeError' && (msg.includes('fetch') || msg.includes('Failed to fetch') || msg.includes('NetworkError'))) {
+                    msg = 'មិនអាចភ្ជាប់ទៅកាន់ម៉ាស៊ីនបម្រើ (Backend Server) បានទេ។ សូមប្រាកដថាម៉ាស៊ីនបម្រើដំណើរការលើ Port 3000 (npm start)។';
+                }
+                errorDiv.textContent = msg;
+                errorDiv.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>ចូលទៅផ្ទាំងគ្រប់គ្រង</span><i class="fas fa-arrow-right text-xs"></i>';
+            }
+        });
+
+        // Logout Handler
+        async function handleLogout() {
+            try {
+                await fetch(API_BASE + '/api/admin/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+            } catch (e) {}
+            showToast('បានចាកចេញដោយជោគជ័យ');
+            showLogin();
+        }
+
+        // Load Stats & Data
+        async function loadDashboardData() {
+            loadStats();
+            loadRsvps();
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/stats', {
+                    credentials: 'include'
+                });
+                if (res.ok) {
+                    const stats = await safeParseJson(res);
+                    document.getElementById('stat-total').textContent = (stats.total || 0).toLocaleString();
+                    document.getElementById('stat-attending').textContent = (stats.attending || 0).toLocaleString();
+                    document.getElementById('stat-declined').textContent = (stats.declined || 0).toLocaleString();
+                    document.getElementById('stat-wishes').textContent = (stats.wishesCount || 0).toLocaleString();
+
+                    document.getElementById('count-all').textContent = stats.total || 0;
+                    document.getElementById('count-attending').textContent = stats.attending || 0;
+                    document.getElementById('count-declined').textContent = stats.declined || 0;
+                }
+            } catch (e) {
+                console.error('Error loading stats:', e);
+            }
+        }
+
+        async function loadRsvps() {
+            const tableBody = document.getElementById('rsvp-table-body');
+            tableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-yellow-200/50"><i class="fas fa-spinner fa-spin mr-2"></i> កំពុងផ្ទុកទិន្នន័យ...</td></tr>`;
+
+            const offset = (currentPage - 1) * pageSize;
+            const params = new URLSearchParams({
+                search: currentSearch,
+                status: currentFilter,
+                limit: pageSize,
+                offset: offset
+            });
+
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/rsvps?${params.toString()}`, {
+                    credentials: 'include'
+                });
+                if (!res.ok) {
+                    if (res.status === 401) return showLogin();
+                    throw new Error('Failed to load RSVPs');
+                }
+
+                const data = await safeParseJson(res);
+                totalCount = data.total || 0;
+                renderTable(data.items || [], offset);
+                updatePagination();
+            } catch (err) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i> បរាជ័យក្នុងការទាញយកទិន្នន័យ</td></tr>`;
+            }
+        }
+
+        function renderTable(items, offset) {
+            const tbody = document.getElementById('rsvp-table-body');
+            if (!items || items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-neutral-400"><i class="fas fa-inbox text-3xl mb-2 text-yellow-500/40 block"></i> មិនទាន់មានការឆ្លើយតបនៅឡើយទេ</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = items.map((item, index) => {
+                const isAttending = item.status && (item.status.includes('អញ្ជើញ') || item.status.toLowerCase().includes('attending'));
+                const statusBadge = isAttending ?
+                    `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40"><i class="fas fa-check text-[10px]"></i> ${escapeHtml(item.status)}</span>` :
+                    `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-950/80 text-amber-300 border border-amber-500/40"><i class="fas fa-times text-[10px]"></i> ${escapeHtml(item.status)}</span>`;
+
+                const isHidden = item.is_hidden === 1;
+                const hiddenBadge = isHidden
+                    ? `<span class="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-800 text-yellow-400 border border-yellow-500/30"><i class="fas fa-eye-slash text-[9px]"></i> បានលាក់</span>`
+                    : '';
+
+                const formattedDate = item.created_at ? new Date(item.created_at).toLocaleString('km-KH', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short'
+                }) : '-';
+
+                const hideBtn = isHidden
+                    ? `<button onclick="toggleHideRsvpItem(${item.id}, '${escapeHtml(item.name)}', true)" title="បង្ហាញឡើងវិញ (Show)" class="p-2 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/20 rounded-lg transition cursor-pointer">
+                           <i class="fas fa-eye-slash text-base"></i>
+                       </button>`
+                    : `<button onclick="toggleHideRsvpItem(${item.id}, '${escapeHtml(item.name)}', false)" title="លាក់ (Hide)" class="p-2 text-neutral-400 hover:text-yellow-400 hover:bg-yellow-500/10 rounded-lg transition cursor-pointer">
+                           <i class="fas fa-eye text-base"></i>
+                       </button>`;
+
+                return `
+                    <tr class="hover:bg-yellow-500/5 transition ${isHidden ? 'opacity-60 bg-black/40' : ''}">
+                        <td class="py-3 px-4 text-center text-neutral-500 font-mono">${offset + index + 1}</td>
+                        <td class="py-3 px-4 font-semibold text-yellow-100 flex items-center">
+                            <span>${escapeHtml(item.name)}</span>
+                            ${hiddenBadge}
+                        </td>
+                        <td class="py-3 px-4">${statusBadge}</td>
+                        <td class="py-3 px-4 max-w-xs md:max-w-md truncate text-neutral-300" title="${escapeHtml(item.wish || '')}">
+                            ${escapeHtml(item.wish || 'គ្មានពាក្យជូនពរទេ')}
+                        </td>
+                        <td class="py-3 px-4 text-neutral-400 text-[11px] whitespace-nowrap">${formattedDate}</td>
+                        <td class="py-3 px-4 text-center">
+                            ${hideBtn}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updatePagination() {
+            const start = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalCount);
+            document.getElementById('page-showing').textContent = `${start}-${end}`;
+            document.getElementById('page-total').textContent = totalCount;
+            document.getElementById('page-indicator').textContent = currentPage;
+
+            document.getElementById('btn-prev-page').disabled = currentPage <= 1;
+            document.getElementById('btn-next-page').disabled = end >= totalCount;
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            loadRsvps();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            currentPage = 1;
+
+            const tabs = {
+                '': 'filter-all',
+                'អញ្ជើញចូលរួម': 'filter-attending',
+                'អភ័យទោសខកខាន': 'filter-declined'
+            };
+
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.className = 'filter-tab px-3 py-1.5 rounded-lg text-xs font-medium border border-yellow-500/30 text-yellow-200/80 hover:bg-yellow-500/10 cursor-pointer';
+            });
+            const activeTab = document.getElementById(tabs[filter]);
+            if (activeTab) {
+                activeTab.className = 'filter-tab px-3 py-1.5 rounded-lg text-xs font-medium gold-btn cursor-pointer';
+            }
+
+            loadRsvps();
+        }
+
+        let searchDebounceTimer;
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                currentSearch = e.target.value.trim();
+                currentPage = 1;
+                loadRsvps();
+            }, 300);
+        });
+
+        // Hide / Unhide RSVP (instead of Delete)
+        async function toggleHideRsvpItem(id, name, isCurrentlyHidden) {
+            const actionText = isCurrentlyHidden ? 'បង្ហាញឡើងវិញ' : 'លាក់';
+            const confirmMsg = isCurrentlyHidden 
+                ? `តើអ្នកចង់បង្ហាញទិន្នន័យភ្ញៀវ "${name}" ឡើងវិញមែនទេ?` 
+                : `តើអ្នកចង់លាក់ទិន្នន័យភ្ញៀវ "${name}" មែនទេ?`;
+
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/rsvps/${id}/hide`, {
+                    method: 'PATCH',
+                    credentials: 'include'
+                });
+                const data = await safeParseJson(res);
+                if (!res.ok) throw new Error(data.error || `បរាជ័យក្នុងការ${actionText}`);
+                showToast(data.message || `បាន${actionText} "${name}" រួចរាល់`);
+                loadDashboardData();
+            } catch (err) {
+                showToast(err.message, false);
+            }
+        }
+
+        // Export to CSV with UTF-8 BOM
+        function exportToCSV() {
+            window.location.href = API_BASE + '/api/admin/export';
+        }
+
+        // Change Password Modal
+        function openChangePasswordModal() {
+            document.getElementById('password-modal').classList.remove('hidden');
+            document.getElementById('password-form').reset();
+            document.getElementById('pwd-error').classList.add('hidden');
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+        }
+
+        document.getElementById('password-form').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById('pwd-current').value;
+            const newPassword = document.getElementById('pwd-new').value;
+            const confirmPassword = document.getElementById('pwd-confirm').value;
+            const errDiv = document.getElementById('pwd-error');
+
+            if (newPassword !== confirmPassword) {
+                errDiv.textContent = 'ពាក្យសម្ងាត់ថ្មីទាំងពីរមិនដូចគ្នាទេ';
+                errDiv.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/api/admin/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        currentPassword,
+                        newPassword
+                    })
+                });
+                const data = await safeParseJson(res);
+                if (!res.ok) throw new Error(data.error || 'បរាជ័យក្នុងការប្តូរពាក្យសម្ងាត់');
+
+                closeChangePasswordModal();
+                showToast('ពាក្យសម្ងាត់ត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ!');
+            } catch (err) {
+                errDiv.textContent = err.message;
+                errDiv.classList.remove('hidden');
+            }
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Init
+        checkAuth();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Start Wedding Server (F5)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/../server.js",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "restart": true
+    }
+  ]
+}

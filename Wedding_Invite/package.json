@@ -1,0 +1,9 @@
+{
+  "name": "wedding-invite-client",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node ../server.js",
+    "dev": "node --watch ../server.js",
+    "test": "node -e \"process.chdir('..'); require('./server.js'); require('./test_server.js');\""
+  }
+}
